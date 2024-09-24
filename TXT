@@ -1,0 +1,45 @@
+1 quiz app hai browser base local host pe run krne k liye
+
+3 menus
+
+1) main, quiz, result
+
+main menu:
+3 input field for quiz settings
+
+quiz category: dropdown > values from data file
+total questions: 
+quiz time
+start button
+
+quiz menu
+show 1 question at a time
+shuffle options before display 
+show timer > timer is for entire quiz. if times up finish quiz automatically
+
+next  button, skip button, finish button
+
+result
+result in numeric and percentage
+pass or fail (>=75% pass)
+
+table to show all questions with selected option highlight
+if  correct green else red highlight and highlight correct one with green
+
+all data is in csv.
+in following format
+
+colA: category
+colB: question
+colC-G: options
+colH: answer
+
+
+
+Build the required html templates
+the authoer gives csv and upload to the quiz 
+    take csv and convert it to database.
+    from that database use jinja to write the quiz
+student to start the main menu and no other access
+Above have the template designs already given.
+

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')  }}">
+    <title>Quiz App</title>
+</head>
+<body>
+
+    <section id="quizBox">
+
+      {% for quizs in quizqs %}
+      {{ quizs }}
+      {% endfor %}
+      <!-- depending on the id the questions and its options will appear -->
+      <div class="card">
+        <div class="card-body p-4">
+          <div class="d-flex ">
+            <p style="color: #9ADE7B;font-family: 'Open Sans', sans-serif;" id="questionid"></p>
+            <p id="questions"  style="font-family: 'Open Sans', sans-serif; font-size: large;"></p>
+        </div>
+
+          <form action="" methd="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="quiz-ans" id="input1">
+              <label class="form-check-label" for="option" id="option1"></label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="quiz-ans" id="input2">
+              <span class="radio-button"></span>
+              <label class="form-check-label" for="option" id="option2"></label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="quiz-ans" id="input3">
+              <label class="form-check-label" for="option"id="option3"></label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="quiz-ans" id="input4">
+              <label class="form-check-label" for="option"id="option4"></label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="quiz-ans" id="input5">
+              <label class="form-check-label" for="option" id="option5"></label>
+            </div>
+
+            <p id="error-show"></p>
+            <button type="button" class="btn btn-primary button-68" id="nextquestion">Next 
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>
+            </button>
+          </form>
+          <!-- <button class="" role="button">Button 68</button> -->
+
+        </div>
+      </div>
+    </section> 
+
+    <div class="quiz-done">
+      <h2> Quiz is done</h2>
+    </div>
+
+    <div class="container d-flex justify-content-end mt-3">
+      <button type="button" class="btn btn-primary  button-68" >Skip</button>
+      <!-- <input type="text" id="input">  -->
+      <!-- <button onclick="sendData()">Send Data</button> -->
+      <a id="finish-button" type="button" class="btn btn-primary  button-68" style="margin-left: 10px;">Finish</a>
+    </div>
+
+    <!-- <div id="clock"></div> -->
+    <!-- <aside id="countdown">00:00</aside> -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+      
+
+      // Quiz Data
+      const dtf = {{ df|tojson }}
+
+      let quiz_complete = true;
+
+      var parsedDtf = JSON.parse(dtf)
+
+      // Making Data into a javasript object
+      function QuizDataset(id, question, option1, option2, option3, option4, option5, answer){
+        this.id = id
+        this.question = question
+        this.option1 = option1
+        this.option2 = option2
+        this.option3 = option3
+        this.option4 = option4
+        this.option5 = option5
+        this.answer = answer
+      }
+
+      // Dataset created to show in the quiz
+      for(var i in parsedDtf){
+        var questionData = new QuizDataset(parsedDtf["id"], parsedDtf["Question"], parsedDtf["Option1"], parsedDtf["Option2"], parsedDtf["Option3"], parsedDtf["Option4"], parsedDtf["Option5"], parsedDtf["Answer"])
+      }
+
+      
+      const ids2 = Object.values(parsedDtf["id"])
+      // Taking Random Index no.
+      function returnRandomId(arr){
+      const randomId = Math.floor(Math.random() * arr.length)
+      console.log('Random Index:', randomId);
+      return randomId
+      }
+      
+      // Chaniging Questions and Options
+      let nextBtn = document.querySelector('#nextquestion')
+      let radioButtons = document.querySelectorAll('input[name="option"]')
+      
+      var ansData = [];
+
+      // document.querySelector('input[name="Choose"]:checked').checked = false;
+      // dont loop on null values
+
+      let id = 0;
+      nextQuestion(id); //returnRandomId(ids2)
+      nextBtn.addEventListener("click", ()=>{
+        
+        // Preping Anwser Data
+
+        var element = {}
+        current_question = document.querySelector("#questions")
+        keyR = current_question.getAttribute('name')
+        element['id'] = current_question.getAttribute('name')
+        element['question'] = current_question.textContent
+        element["student_ans"] = document.querySelector('input[name="quiz-ans"]:checked').value
+        element["correct_ans"] = questionData['answer'][Number(keyR)]
+        ansData.push({element: element})
+        console.log(ansData)
+      
+        
+        for (var objK in questionData){
+            if (questionData[objK].hasOwnProperty(keyR)){
+              delete questionData[objK][keyR]
+            }
+          }
+        // var randoms = returnRandomId(ids2)
+        // id = questionData['id'][randoms]
+        // if (id !== undefined){
+        id++;
+        nextQuestion(id);
+        // }
+        // else{
+        //   delete ids2[randoms]
+        //   console.log(ids2)
+        //   ids2.reduce
+        //   // console.error('Error: returnRandomId returned undefined.');
+        // }
+        
+        var ele = document.getElementsByName("quiz-ans");
+        for(var i=0;i<ele.length;i++){
+            ele[i].checked = false;
+          }
+
+        if (id >= 5){
+          var quizbox = document.querySelector('#quizBox');
+          quizbox.style.display = 'none'
+          var quizDone = document.querySelector('.quiz-done')
+          quizDone.style.display = 'block'
+          quiz_complete = true;
+          console.log("Yes Quiz Complete" + quiz_complete)
+        }
+        // }
+        // document.querySelector('input[name="Choose"]:checked').checked = false; alternative
+        //document.getElementById('error-show').innerHTML = "Enter the input please"
+        // console.log(ans)
+      });
+
+      // return to flask
+      // redirect to results
+
+      function nextQuestion(index){
+          qtag = document.getElementById('questions').setAttribute('name', index)
+          document.getElementById('questionid').innerHTML = questionData["id"][index] + ".  " 
+          document.getElementById('questions').innerHTML = questionData["question"][index] // JSON.stringify(questionData["question"][index])
+          var opt1 = document.getElementById('input1').value = questionData["option1"][index] // JSON.stringify(questionData["option1"][index])
+          document.getElementById('option1').innerHTML = opt1;
+          var opt2 = document.getElementById('input2').value = questionData["option2"][index]  //JSON.stringify(questionData["option2"][index])
+          document.getElementById('option2').innerHTML = opt2;
+          var opt3 = document.getElementById('input3').value = questionData["option3"][index] //JSON.stringify(questionData["option3"][index])
+          document.getElementById('option3').innerHTML = opt3;
+          var opt4 = document.getElementById('input4').value = questionData["option4"][index] //JSON.stringify(questionData["option4"][index])
+          document.getElementById('option4').innerHTML = opt4;
+          var opt5 = document.getElementById('input5').value = questionData["option5"][index] // JSON.stringify(questionData["option5"][index])
+          document.getElementById('option5').innerHTML = opt5;
+      }
+
+      function sendtoServer(){
+        var xml = new XMLHttpRequest();
+        xml.open("POST", "{{ url_for('result') }}", true)
+        xml.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xml.onload = function(){
+          var dataReply = JSON.parse(this.responseText)
+        }
+      }
+
+      // document.querySelector('nextquestion').onclick = nextQuestion(returnRandomId(ids2)) Uncaught TypeError: Cannot set properties of null (setting 'onclick')
+      // use this type of onclick so that the data is already visible and only needs the buttons to change it
+      
+     
+      finishBtn = document.getElementById('finish-button');
+      let WindowOrigin = window.origin;
+      finishBtn.addEventListener('click', ()=>{
+            
+          if (quiz_complete == true){
+            console.log(JSON.stringify(ansData))
+            /*
+
+            $.ajax({
+              url: '{{ url_for("result") }}',
+              type: 'POST',
+              data: {
+                answer_data : ansData
+              },
+              success: function(response) {
+                console.log(response); // Handle the successful response
+              },
+              error: function(error) {
+                console.error(error); // Handle errors
+              }
+            });
+            */
+
+
+            function sendAnswerData() {
+              fetch('{{ url_for("quizpage") }}', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(ansData)
+              })
+              .then(response => response.json())
+              .then(data => {
+                console.log(data); // Handle the response data here
+              })
+              .catch(error => {
+                console.error(error);
+              });
+            }
+            window.location.href = '{{ url_for("result") }}';
+              
+            /*
+function sendData() { 
+            var value = document.getElementById('input').value; 
+            $.ajax({ 
+                url: '/quizpage', 
+                type: 'POST', 
+                contentType: 'application/json', 
+                data: ansData, 
+                // success: function(response) { 
+                //     document.getElementById('output').innerHTML = response.result; 
+                // }, 
+                // error: function(error) { 
+                //     console.log(error); 
+                // } 
+            }); 
+        }
+*/
+
+            
+
+
+          };
+      });
+  
+      
+
+      
+      // Stop quiz on time when 0:00
+    </script>
+
+    <!-- <script src="{# url_for('static', filename='main.js') #}"></script> -->
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+</html>

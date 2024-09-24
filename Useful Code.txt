@@ -1,0 +1,55 @@
+#######
+
+Turn csv to database
+
+
+# from sqlalchemy import Column, Integer, Text, String, create_engine
+# import pandas as pd
+# import sqlalchemy
+from localhostquiz.model import db,Quiz
+
+
+# from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
+
+
+    # class Quiz(db.Model):
+
+    #     __tablename__ = 'quiz'
+
+    #     id = Column(Integer, primary_key=True)
+    #     category = Column(String(2))
+    #     question = Column(Text)
+    #     option1 = Column(String(12))
+    #     option2 = Column(String(12))
+    #     option3 = Column(String(12))
+    #     option4 = Column(String(12))
+    #     option5 = Column(String(12))
+    #     answer = Column(String(12))
+    
+    # engine = create_engine("sqlite:///quiz.db")
+
+    # Base = declarative_base()
+    # Base.metadata.create_all(engine)
+
+    # # df = pd.read_csv('./localhostquiz/data.csv')
+
+    # # df.to_sql(con=engine, name=Quiz.__tablename__, if_exists='replace', index=False)
+
+    # session = sessionmaker()
+    # session.configure(bind=engine)
+
+    # s= session()
+    # choices = list(Quiz.query.with_entities(Quiz.category).distinct()) # change the type of query
+    # alist = []
+    # for choice in choices:
+    #     # # a = choice
+    #     # print(choice)
+
+    #     alist= [i for i in choice]
+    #     print(alist)
+    # result = s.query(Quiz.id).all()
+    # for r in result:
+    #     print(r)
+   
+==============
+
